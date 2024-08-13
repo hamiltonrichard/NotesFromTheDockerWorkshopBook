@@ -118,11 +118,11 @@ IMAGE          CREATED          CREATED BY                                      
 <missing>      2 months ago     /bin/sh -c #(nop)  ARG LAUNCHPAD_BUILD_ARCH     0B
 <missing>      2 months ago     /bin/sh -c #(nop)  ARG RELEASE                  0B
 ```
-_docker image inspect \<image name>_ can provide addition information about the image as well. 
+_docker image inspect \<image name>_ can provide additional information about the image as well. 
 
 ### Exercise 3.01 Notes
 
-__NOTE:__ If you are using the docker file from this repository you'll need to uncomment the line that adds _wget_ and _curl_.
+__NOTE:__ If you are using the docker file from this repository you'll need to uncomment the line that adds __wget__ and __curl__.
 
 
 __Dangling images__
