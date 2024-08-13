@@ -29,7 +29,7 @@ For additional details click on the directive to see the documentation for the s
 |[**EXPOSE**](https://docs.docker.com/reference/dockerfile/#expose)|Allows access to a port. The exposed port can be accessed within docker containers or to external resources using the (__-p__) parameter| __EXPOSE -p <host_port> : <remote_port>__ |
 |[**HEALTHCHECK**](https://docs.docker.com/reference/dockerfile/#healthcheck)|Used to determine the health of a container.| __HEALTHCHECK CMD curl -f http://localhost/ \|\| exit 1__ |
 |[**ONBUILD**](https://docs.docker.com/reference/dockerfile/#onbuild)|When creating a base image, this command will be executed in the child image|ONBUILD ENTRYPOINT __["echo","Running ONBUILD directive"]__||
-## Buiding Docker Images
+### Buiding Docker Images
 
 To build an image the following command can be used:
 
@@ -70,7 +70,7 @@ You can also specify a version if needed:
 docker image build -t my-tagged-image:v2.0 .
 ```
 
-## Exercise 2.04 Notes
+### Exercise 2.04 Notes
 
 The exercise is broken. The image file isn't available I used the following:
 
