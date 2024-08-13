@@ -179,6 +179,9 @@ Alpine       latest   961769676411  5 weeks ago      5.58MB
 To clean up, you can execute ```docker image prune```. 
 
 ### Exercise 3.02 Notes
+
+Review the Dockerfile from this repository if you are using it. You'll need to modify the docker file for later exercises. 
+
 **IF** you wanted to get rid of all the images on a system then you can use ```docker rmi -f $(docker images -a -q). The output would look something like this:
 
 ```
@@ -187,7 +190,128 @@ Deleted: sha256:10c414958643f87f05b9639c609ce53319b96057f39fed93f76e3fde55bf7d39
 ```
 The shasum is the __IMAGE ID__. Before running the _docker rmi_ command you could list your images first so you can validate which was image was deleted. 
 
+Performing the first build showed there were 12 layers:
 
+```
+IMAGE          CREATED             CREATED BY                                      SIZE      COMMENT
+d3e682506e1b   3 minutes ago       RUN /bin/sh -c cat Dockerfile # buildkit        0B        buildkit.dockerfile.v0
+<missing>      3 minutes ago       RUN /bin/sh -c rm /tmp/Dockerfile.tar.gz # b…   0B        buildkit.dockerfile.v0
+<missing>      3 minutes ago       RUN /bin/sh -c tar -zxvf /tmp/Dockerfile.tar…   443B      buildkit.dockerfile.v0
+<missing>      3 minutes ago       COPY Dockerfile.tar.gz /tmp/ # buildkit         482B      buildkit.dockerfile.v0
+<missing>      3 minutes ago       WORKDIR /var/www/html/                          0B        buildkit.dockerfile.v0
+<missing>      3 minutes ago       CMD ["/bin/sh" "-c" "mkdir /var/www/html/"]     0B        buildkit.dockerfile.v0
+<missing>      3 minutes ago       CMD ["/bin/sh" "-c" "mkdir /var/www/"]          0B        buildkit.dockerfile.v0
+<missing>      3 minutes ago       RUN /bin/sh -c wget -O test.txt https://gith…   105MB     buildkit.dockerfile.v0
+<missing>      10 minutes ago      RUN /bin/sh -c apk add wget curl # buildkit     6.44MB    buildkit.dockerfile.v0
+<missing>      About an hour ago   RUN /bin/sh -c apk update # buildkit            2.32MB    buildkit.dockerfile.v0
+<missing>      3 weeks ago         /bin/sh -c #(nop)  CMD ["/bin/sh"]              0B
+<missing>      3 weeks ago         /bin/sh -c #(nop) ADD file:99093095d62d04215…   7.8MB
+```
+The time it took to build the image as shown by the time command was:
+
+```
+real    0m6.715s
+user    0m0.388s
+sys     0m0.219s
+```
+
+
+Combining the run commands reduced the number of layers in the image.
+
+```
+IMAGE          CREATED          CREATED BY                                      SIZE      COMMENT
+c4b5172bbb4c   53 seconds ago   RUN /bin/sh -c cat Dockerfile # buildkit        0B        buildkit.dockerfile.v0
+<missing>      53 seconds ago   RUN /bin/sh -c tar -zxvf /tmp/Dockerfile.tar…   443B      buildkit.dockerfile.v0
+<missing>      53 seconds ago   COPY Dockerfile.tar.gz /tmp/ # buildkit         482B      buildkit.dockerfile.v0
+<missing>      53 seconds ago   WORKDIR /var/www/html/                          0B        buildkit.dockerfile.v0
+<missing>      53 seconds ago   CMD ["/bin/sh" "-c" "mkdir /var/www/html/"]     0B        buildkit.dockerfile.v0
+<missing>      53 seconds ago   CMD ["/bin/sh" "-c" "mkdir /var/www/"]          0B        buildkit.dockerfile.v0
+<missing>      53 seconds ago   RUN /bin/sh -c wget -O test.txt https://gith…   105MB     buildkit.dockerfile.v0
+<missing>      56 seconds ago   RUN /bin/sh -c apk update && apk add wget cu…   8.76MB    buildkit.dockerfile.v0
+<missing>      3 weeks ago      /bin/sh -c #(nop)  CMD ["/bin/sh"]              0B
+<missing>      3 weeks ago      /bin/sh -c #(nop) ADD file:99093095d62d04215…   7.8MB
+```
+
+And the build time was reduced by 0.515 seconds
+```
+real    0m6.200s
+user    0m0.381s
+sys     0m0.267s
+```
+Additional time can be saved when building images with the __--cache-from__ option. For example:
+
+```
+docker build --cache-from basic-base -t basic-app .
+```
+
+#### Docker commit notes
+
+The **_docker commit_** allows you to create a new image from an existing container.  In the lab the basic-app container is executed:
+
+```
+docker run -it basic-app sh
+```
+In the working directory of the image a new text file was created.
+
+Once the change was made the following command was executed to create a new image from the running basic-app container:
+
+```
+docker commit ede3d51bba9e basic-app-test
+```
+A ```docker history``` on the image showed the addition of the file.
+
+```
+IMAGE          CREATED          CREATED BY                                      SIZE      COMMENT
+f920dfc6b302   14 minutes ago   sh                                              34B
+d2919acc6dfe   26 minutes ago   RUN /bin/sh -c cat Dockerfile # buildkit        0B        buildkit.dockerfile.v0
+<missing>      26 minutes ago   ADD Dockerfile.tar.gz /var/www/html # buildk…   443B      buildkit.dockerfile.v0
+<missing>      32 minutes ago   WORKDIR /var/www/html/                          0B        buildkit.dockerfile.v0
+<missing>      32 minutes ago   CMD ["/bin/sh" "-c" "mkdir -p /var/www/html"]   0B        buildkit.dockerfile.v0
+<missing>      32 minutes ago   RUN /bin/sh -c wget -O test.txt https://gith…   105MB     buildkit.dockerfile.v0
+<missing>      32 minutes ago   RUN /bin/sh -c apk update && apk add wget cu…   8.76MB    buildkit.dockerfile.v0
+<missing>      3 weeks ago      /bin/sh -c #(nop)  CMD ["/bin/sh"]              0B
+<missing>      3 weeks ago      /bin/sh -c #(nop) ADD file:99093095d62d04215…   7.8MB
+```
+
+Executing ```docker run basic-app-test cat prod_test_data.txt```. displayed the contents of the prod_test-data.txt file.
+
+llama3 had this to say about __docker commit__:
+
+The `docker commit` command is used to create a new Docker image from an existing container. It's a powerful tool that allows you to save changes made to a running container as a new image, which can
+then be used to spin up new containers.
+
+Here's the basic syntax:
+```
+docker commit <container_id> [<repository_name>][:<tag>]
+```
+Where:
+
+* `<container_id>` is the ID of the container you want to commit. You can find this by running `docker ps -a` and looking at the CONTAINER ID column.
+* `<repository_name>` is the name of the new image that will be created. If you omit this, Docker will use the same name as the original container.
+* `<tag>` is an optional tag for the new image.
+
+Here's what happens when you run `docker commit`:
+
+1. Docker creates a new image by capturing the file system changes made to the container.
+2. The new image is created with the specified repository name and tag (if provided).
+3. The image is based on the same base image as the original container, but it includes all the changes made to the container.
+
+Some key things to keep in mind:
+
+* When you commit a container, Docker creates a new layer on top of the existing layers that make up the original container's image.
+* The new image has its own unique ID and is not directly related to the original container's ID.
+* If you want to preserve the changes made to the original container, you should commit it regularly or create a snapshot (more on this later).
+* You can also use `docker commit` to update an existing image. For example, if you have an image named "my-image" and you've made some changes to a container based on that image, you can run `docker
+commit <container_id> my-image:latest` to create a new version of the image with the latest changes.
+
+Some common use cases for `docker commit` include:
+
+* Creating a snapshot of a running container to preserve its state.
+* Updating an existing image with new features or bug fixes.
+* Creating a custom base image for other containers.
+
+Remember that when you commit a container, it's essentially creating a "moment in time" snapshot of the container's file system. If you want to create a reusable and maintainable image, it's often better
+to use `docker build` instead, which allows you to define an image using a Dockerfile.
 
 
 
