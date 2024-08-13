@@ -119,3 +119,72 @@ IMAGE          CREATED          CREATED BY                                      
 <missing>      2 months ago     /bin/sh -c #(nop)  ARG RELEASE                  0B
 ```
 _docker image inspect \<image name>_ can provide addition information about the image as well. 
+
+### Exercise 3.01 Notes
+
+__NOTE:__ If you are using the docker file from this repository you'll need to uncomment the line that adds _wget_ and _curl_.
+
+
+__Dangling images__
+
+You may see an image where the TAG and IMAGE ID are set to \<none>:
+
+```
+REPOSITORY   TAG      IMAGE ID        CREATED           SIZE
+basic-app    latest   c7918f4f95b9    25 seconds ago    8.8MB
+<none>       <none>   0e86ae52098d    2 minutes ago     7.48MB
+Alpine       latest   961769676411    5 weeks ago       5.58MB
+```
+
+These are image layers not associated with an image. These should be removed as they no longer have a purpose.  You can use the _docker image inspect_ command to view information about the layers. 
+
+``` docker image inspect  0e86ae52098d```
+
+The "Data" section of the output shows where the layer is stored on your system:
+
+```
+... 
+  "Data": {
+    "LowerDir": "/var/lib/docker/overlay2/
+      41230f31bb6e89b6c3d619cafc309ff3d4ca169f9576fb003cd60fd4ff
+      4c2f1f/diff:/var/lib/docker/overlay2/
+      b8b90262d0a039db8d63c003d96347efcfcf57117081730b17585e163f
+      04518a/diff",
+    "MergedDir": "/var/lib/docker/overlay2/
+      c7ea9cb56c5bf515a1b329ca9fcb2614f4b7f1caff30624e9f6a219049
+      32f585/
+      merged",
+    "UpperDir": "/var/lib/docker/overlay2/
+      c7ea9cb56c5bf515a1b329ca9fcb2614f4b7f1caff30624e9f6a21904
+      932f585/diff",
+    "WorkDir": "/var/lib/docker/overlay2/
+      c7ea9cb56c5bf515a1b329ca9fcb2614f4b7f1caff30624e9f6a21904
+      932f585/work"
+  },
+```
+To see the amount of space used by your images execute:
+```
+du -sh /var/lib/docker/overlay2/
+```
+For a quick look at the space used by docker images and layers you can use use ```docker images -a```:
+
+```
+REPOSITORY   TAG      IMAGE ID      CREATED          SIZE
+basic-app    latest   c7918f4f95b9  25 seconds ago   8.8MB
+<none>       <none>   0e86ae52098d  2 minutes ago    7.48MB
+<none>       <none>   112a4b041305  11 minutes ago   7MB
+Alpine       latest   961769676411  5 weeks ago      5.58MB
+```
+
+To clean up, you can execute ```docker image prune```. 
+
+**IF** you wanted to get rid of all the images on a system then you can use ```docker rmi -f $(docker images -a -q). The output would look something like this:
+
+```
+Untagged: basic-app:latest
+Deleted: sha256:10c414958643f87f05b9639c609ce53319b96057f39fed93f76e3fde55bf7d39
+```
+The shasum is the __IMAGE ID__. Before running the _docker rmi_ command you could list your images first so you can valide which was deleted. 
+
+
+

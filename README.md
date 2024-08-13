@@ -1,1 +1,3 @@
 Here are my notes from the Packt publishing book, [The Docker Workshop: Learn how to use Docker containers effectively to speed up the development process](https://www.packtpub.com/en-us/product/the-docker-workshop-9781838983444)
+
+You'll see a directory for each of the lab exercises along with the [notes](https://github.com/hamiltonrichard/NotesFromTheDockerWorkshopBook/blob/main/NotesFromTheDockerWorkshopBook.md)
