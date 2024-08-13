@@ -178,6 +178,7 @@ Alpine       latest   961769676411  5 weeks ago      5.58MB
 
 To clean up, you can execute ```docker image prune```. 
 
+### Exercise 3.02 Notes
 **IF** you wanted to get rid of all the images on a system then you can use ```docker rmi -f $(docker images -a -q). The output would look something like this:
 
 ```
