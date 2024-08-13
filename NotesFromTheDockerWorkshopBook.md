@@ -69,3 +69,28 @@ You can also specify a version if needed:
 ```
 docker image build -t my-tagged-image:v2.0 .
 ```
+
+## Exercise 2.04 Notes
+
+The exercise is broken. The image file isn't available I used the following:
+
+__Dockerfile:__
+```
+# WORKDIR, COPY and ADD example
+FROM ubuntu:latest
+RUN apt-get update && apt-get install apache2 -y
+WORKDIR /var/www/html/
+COPY index.html .
+ADD https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/AT-6C_Texans_in_flight_1943.jpg/1280px-AT-6C_Texans_in_flight_1943.jpg AT-6.jpg
+CMD ["ls"]
+```
+__index.html__
+```
+<html>
+  <body>
+    <h1>Welcome to The Docker Workshop</h1>
+    <img src="AT-6.jpg" height="350" width="500"/>
+  </body>
+</html>
+```
+I didn't bother changing the image dimensions since it wasn't part of the exercise. 
