@@ -184,7 +184,9 @@ To clean up, you can execute ```docker image prune```.
 Untagged: basic-app:latest
 Deleted: sha256:10c414958643f87f05b9639c609ce53319b96057f39fed93f76e3fde55bf7d39
 ```
-The shasum is the __IMAGE ID__. Before running the _docker rmi_ command you could list your images first so you can valide which was deleted. 
+The shasum is the __IMAGE ID__. Before running the _docker rmi_ command you could list your images first so you can validate which was image was deleted. 
+
+
 
 
 
