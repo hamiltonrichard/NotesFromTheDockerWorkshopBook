@@ -182,7 +182,7 @@ To clean up, you can execute ```docker image prune```.
 
 Review the Dockerfile from this repository if you are using it. You'll need to modify the docker file for later exercises. 
 
-**IF** you wanted to get rid of all the images on a system then you can use ```docker rmi -f $(docker images -a -q). The output would look something like this:
+**IF** you wanted to get rid of all the images on a system then you can use ```docker rmi -f $(docker images -a -q)```. The output would look something like this:
 
 ```
 Untagged: basic-app:latest
