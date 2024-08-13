@@ -94,3 +94,28 @@ __index.html__
 </html>
 ```
 I didn't bother changing the image dimensions since it wasn't part of the exercise. 
+
+## Chapter 3 - Managing Your Docker Images
+
+### Docker Layers and Caching
+
+Images consists of layers. Each command adds a layer to your image.  When the image is ran, readable and writeable layers are created.  The writable layer is known as a __container image__. 
+
+These layers can be viewed using the _docker history \<image name>_ command:
+
+```
+$docker history workdir-copy-add:latest
+IMAGE          CREATED          CREATED BY                                      SIZE      COMMENT
+15296942a557   29 minutes ago   CMD ["ls"]                                      0B        buildkit.dockerfile.v0
+<missing>      29 minutes ago   ADD https://upload.wikimedia.org/wikipedia/c…   164kB     buildkit.dockerfile.v0
+<missing>      29 minutes ago   COPY index.html . # buildkit                    139B      buildkit.dockerfile.v0
+<missing>      29 minutes ago   WORKDIR /var/www/html/                          0B        buildkit.dockerfile.v0
+<missing>      29 minutes ago   RUN /bin/sh -c apt-get update && apt-get ins…   152MB     buildkit.dockerfile.v0
+<missing>      2 months ago     /bin/sh -c #(nop)  CMD ["/bin/bash"]            0B
+<missing>      2 months ago     /bin/sh -c #(nop) ADD file:5601f441718b0d192…   78.1MB
+<missing>      2 months ago     /bin/sh -c #(nop)  LABEL org.opencontainers.…   0B
+<missing>      2 months ago     /bin/sh -c #(nop)  LABEL org.opencontainers.…   0B
+<missing>      2 months ago     /bin/sh -c #(nop)  ARG LAUNCHPAD_BUILD_ARCH     0B
+<missing>      2 months ago     /bin/sh -c #(nop)  ARG RELEASE                  0B
+```
+_docker image inspect \<image name>_ can provide addition information about the image as well. 
