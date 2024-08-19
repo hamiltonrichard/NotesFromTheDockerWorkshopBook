@@ -313,5 +313,71 @@ Some common use cases for `docker commit` include:
 Remember that when you commit a container, it's essentially creating a "moment in time" snapshot of the container's file system. If you want to create a reusable and maintainable image, it's often better
 to use `docker build` instead, which allows you to define an image using a Dockerfile.
 
+### Creating Base Images
+
+This lab shows how to create a base image consisting of the _Dockerfile_ by using the ```docker cp`` command to create an archive then import it.
+### Exercise 3.03 Notes
+
+In this lab a base image will be created. 
+
+1. Run the basic-app image using:
+```
+docker run -it basic-app sh
+```
+2. Create a tarball to create the base backup this should be executed from _/var/www/html_ which is the workdir of the container:
+```
+tar -czf basebackup.tar.gz --exclude=backup.tar.gz --exclude=proc --exclude=tmp --exclude=mnt --exclude=dev --exclude=sys /
+```
+3. Verify that there is data in the tarball. 
+```
+du -sh basebackup.tar.gz
+```
+
+4. Get the ID of the basic-app container.
+```
+docker ps
+```
+The output should look something like this:
+```
+CONTAINER ID   IMAGE       COMMAND   CREATED         STATUS         PORTS     NAMES
+34d022d388b0   basic-app   "sh"      8 minutes ago   Up 8 minutes             focused_dirac
+```
+5. Copy the tarball from the container image using a combination of the _container_id/path/to/tarball_
+
+```
+docker cp 34d022d388b0:/var/www/html/basebackup.tar.gz /tmp/
+```
+6. Create the new image using ```docker import```:
+
+```
+cat /tmp/basebackup.tar.gz | docker import - mynew-base
+```
+
+7. The verify that the import was successful using ```docker images```:
+
+```
+docker images
+REPOSITORY       TAG       IMAGE ID       CREATED          SIZE
+mynew-base       latest    cf25d52c691d   51 seconds ago   121MB
+basic-app-test   latest    f920dfc6b302   6 days ago       121MB
+basic-app        latest    d2919acc6dfe   6 days ago       121MB
+basic-base       latest    d2919acc6dfe   6 days ago       121MB
+```
+8. Using ```docker history``` see how many layers are in the image. Iit should only have one:
+
+```
+docker history mynew-base:latest 
+IMAGE          CREATED         CREATED BY   SIZE      COMMENT
+cf25d52c691d   3 minutes ago                121MB     Imported from -
+```
+9. View the contents of _/var/www/html_
+```
+docker run mynew-base ls -l /var/www/html
+```
+It should list the contents of the directory showing the docker file:
+
+```
+-rw-r--r--    1 1000     users          443 Aug 13 19:12 Dockerfile
+```
 
 
