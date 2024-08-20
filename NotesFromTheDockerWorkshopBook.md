@@ -380,4 +380,80 @@ It should list the contents of the directory showing the docker file:
 -rw-r--r--    1 1000     users          443 Aug 13 19:12 Dockerfile
 ```
 
+Exercise 3.04
 
+In this lab a small C application is created to run in an image. __You'll need a C compiler installed on your Docker host system! You may need to install the static development C libraries!__
+
+1. Notice if you attempt to execute ```docker pull scratch`` you cannot. You get the following response:
+```
+Using default tag: latest
+Error response from daemon: 'scratch' is a reserved name
+```
+2. Compile the test program using:
+```
+g++ -o test -static test.c
+```
+3. Build the scratch image:
+```
+docker build -t scratchtest .
+```
+Running the image displays:
+
+```
+$docker run -it scratchtest
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+```
+A docker history shows that there are only two layers the image. The orgional scratch layer and the test binary.
+
+```
+docker history scratchtest
+IMAGE          CREATED          CREATED BY              SIZE      COMMENT
+9070824a8992   11 minutes ago   CMD ["/test"]           0B        buildkit.dockerfile.v0
+<missing>      11 minutes ago   ADD test / # buildkit   4.93MB    buildkit.dockerfile.v0
+```
+### Docker Image Naming and Tagging
+
+Tags are used to provide useful information about the image.  Specifically the respository name and a tag.  Two ways of taging an image. One is using: 
+
+```
+docker tag _<source_repository_name>:<tag>_ <taget_respository_name>:<tag>. 
+```
+A image can also be tagged using the '-t` option during the build process:
+```
+docker build -t <target_repository_name>:tag Dockerfile
+```
+In the case of pusing images to Docker Hub, you can specify a Docker Hub username:
+```
+docker build -t <dockerhub_user>/<target_repository_name>:<tag> Dockerfile
+```
+
+### Exercise 3.05 Notes
+
+You can use iether the ID or repository when tagging images. 
+
+Using the image ID:
+```
+docker tag 19485c79a9bb new_busybox:ver_1
+```
+You can use a repsotiry name.
+```
+docker tag new_busybox:ver_1 vence/busybox:ver_1.1
+```
+
+### Using the latest Tag in Docker
+
+Remember that _latest_ is simply a tag. Try to avoid using it when possible. Espically when an image is built multiple times a day for example. 
+
+### Exercise 3.06 Notes
+
+The lab demonstrates that using the _latest_ tag can be problematic.  Having an image built with _latest_ as a tag doesn't necessarly 
+### Docker Image Tagging Policies
